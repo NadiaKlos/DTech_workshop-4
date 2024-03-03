@@ -1,6 +1,9 @@
 import bodyParser from "body-parser";
 import express from "express";
 import { BASE_USER_PORT } from "../config";
+import { BASE_ONION_ROUTER_PORT } from "../config";
+import { REGISTRY_PORT } from "../config";
+
 
 let lastReceivedMessage: string | null = null;
 let lastSentMessage: string | null = null;

@@ -1,10 +1,34 @@
+import axios from "axios";
 import bodyParser from "body-parser";
+import crypto from "crypto";
 import express from "express";
 import { BASE_ONION_ROUTER_PORT } from "../config";
 
-let lastReceivedEncryptedMessage: string | null = null;
-let lastReceivedDecryptedMessage: string | null = null;
-let lastMessageDestination: number | null = null;
+
+
+// Déclaration de l'interface RegisterNodeBody
+interface RegisterNodeBody {
+    nodeId: number;
+    pubKey: string;
+}
+
+let privateKey: string | null = null;
+
+// Function to generate a private key
+function generatePrivateKey(): string {
+    const { privateKey } = crypto.generateKeyPairSync("rsa", {
+        modulusLength: 2048,
+        publicKeyEncoding: {
+            type: "pkcs1",
+            format: "pem",
+        },
+        privateKeyEncoding: {
+            type: "pkcs1",
+            format: "pem",
+        },
+    });
+    return privateKey.toString();
+}
 
 export async function simpleOnionRouter(nodeId: number) {
     const onionRouter = express();
@@ -15,17 +39,28 @@ export async function simpleOnionRouter(nodeId: number) {
         res.send("live");
     });
 
-    onionRouter.get("/getLastReceivedEncryptedMessage", (req, res) => {
-        res.json({ result: lastReceivedEncryptedMessage });
+    onionRouter.get("/getPrivateKey", (req, res) => {
+        res.json({ result: privateKey });
     });
 
-    onionRouter.get("/getLastReceivedDecryptedMessage", (req, res) => {
-        res.json({ result: lastReceivedDecryptedMessage });
-    });
+    // Appeler le registre pour enregistrer le nœud
+    const registerNode = async () => {
+        try {
+            const response = await axios.post("http://localhost:3000/registerNode", {
+                nodeId,
+                pubKey: privateKey,
+            } as RegisterNodeBody);
+            console.log(response.data);
+        } catch (error) {
+            console.error("Error registering node:", error);
+        }
+    };
 
-    onionRouter.get("/getLastMessageDestination", (req, res) => {
-        res.json({ result: lastMessageDestination });
-    });
+    // Générer une clé privée pour le nœud
+    privateKey = generatePrivateKey();
+
+    // Enregistrer le nœud
+    await registerNode();
 
     const server = onionRouter.listen(BASE_ONION_ROUTER_PORT + nodeId, () => {
         console.log(

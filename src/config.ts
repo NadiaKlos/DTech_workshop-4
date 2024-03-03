@@ -1,9 +1,7 @@
 export const REGISTRY_PORT = 8080;
 export const BASE_ONION_ROUTER_PORT = 4000;
 export const BASE_USER_PORT = 3000;
-
 import express from "express";
-import { REGISTRY_PORT } from "../config";
 
 const registry = express();
 
