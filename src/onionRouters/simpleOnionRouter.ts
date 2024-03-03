@@ -1,16 +1,9 @@
-import axios from "axios";
 import bodyParser from "body-parser";
-import crypto from "crypto";
 import express from "express";
 import { BASE_ONION_ROUTER_PORT } from "../config";
-
-
-
-// Déclaration de l'interface RegisterNodeBody
-interface RegisterNodeBody {
-    nodeId: number;
-    pubKey: string;
-}
+import { RegisterNodeBody } from "../types";
+import axios from "axios";
+import crypto from "crypto";
 
 let privateKey: string | null = null;
 
@@ -43,7 +36,7 @@ export async function simpleOnionRouter(nodeId: number) {
         res.json({ result: privateKey });
     });
 
-    // Appeler le registre pour enregistrer le nœud
+    // Call the registry to register the node
     const registerNode = async () => {
         try {
             const response = await axios.post("http://localhost:3000/registerNode", {
@@ -56,10 +49,10 @@ export async function simpleOnionRouter(nodeId: number) {
         }
     };
 
-    // Générer une clé privée pour le nœud
+    // Generate private key for the node
     privateKey = generatePrivateKey();
 
-    // Enregistrer le nœud
+    // Register the node
     await registerNode();
 
     const server = onionRouter.listen(BASE_ONION_ROUTER_PORT + nodeId, () => {

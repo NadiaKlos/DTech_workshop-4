@@ -1,11 +1,17 @@
 import bodyParser from "body-parser";
 import express from "express";
-import { Node, RegisterNodeBody, GetNodeRegistryBody } from "../types";
 import { REGISTRY_PORT } from "../config";
-import { BASE_ONION_ROUTER_PORT } from "../config";
-import { BASE_USER_PORT } from "../config";
 
+export type Node = { nodeId: number; pubKey: string };
 
+export type RegisterNodeBody = {
+  nodeId: number;
+  pubKey: string;
+};
+
+export type GetNodeRegistryBody = {
+  nodes: Node[];
+};
 
 const registeredNodes: Node[] = [];
 
